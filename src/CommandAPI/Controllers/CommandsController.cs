@@ -22,7 +22,7 @@ namespace src.CommandAPI.Controllers
         }
 
         [HttpGet]
-        public ActionResult<IEnumerable<CommandReadDto>> Get()
+        public ActionResult<IEnumerable<CommandReadDto>> GetAllCommands()
         {
             var commands = repo.GetAllCommands();
             return Ok(mapper.Map<IEnumerable<CommandReadDto>>(commands));

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using src.CommandAPI.Models;
@@ -14,22 +15,20 @@ namespace src.CommandAPI.Data
         }
         public void CreateCommand(Command command)
         {
-            if(command.Id == 0)
+            if(command == null)
             {
-                context.Add(command);
+                throw new ArgumentNullException(nameof(command));
             }
-            else
-            {
-                UpdateCommand(command);
-            }
-            
-            SaveChanges();
+            context.Add(command);
         }
 
         public void DeleteCommand(Command command)
         {
-            context.Remove(command);
-            SaveChanges();
+            if(command == null)
+            {
+                throw new ArgumentNullException();
+            }
+            context.Commands.Remove(command);
         }
 
         public IEnumerable<Command> GetAllCommands()
@@ -45,13 +44,12 @@ namespace src.CommandAPI.Data
         public bool SaveChanges()
         {
             var result = context.SaveChanges();
-            return result == 1;
+            return result >= 0;
         }
 
         public void UpdateCommand(Command command)
         {
-            context.Entry(command).GetDatabaseValues().SetValues(command);
-            SaveChanges();
+        
         }
     }
 }

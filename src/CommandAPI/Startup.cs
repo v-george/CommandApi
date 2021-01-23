@@ -12,6 +12,8 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using src.CommandAPI.Data;
 using Npgsql;
+using AutoMapper;
+using Newtonsoft.Json.Serialization;
 
 namespace CommandAPI
 {
@@ -28,10 +30,9 @@ namespace CommandAPI
         public void ConfigureServices(IServiceCollection services)
         {
             
-            services.AddControllers();
-            services.AddSwaggerGen(opt => {
-                opt.SwaggerDoc("v1", new OpenApiInfo{ Version="v1", Title= "CommandAPI" });
-            });
+            services.AddControllers().AddNewtonsoftJson(s => {
+                s.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
+                });
             services.AddScoped<ICommandAPIRepo, MockCommandAPIRepo>();
             var builder = new NpgsqlConnectionStringBuilder();
             builder.ConnectionString = Configuration.GetConnectionString("PostgreSqlConnection");
@@ -39,6 +40,10 @@ namespace CommandAPI
             builder.Password = Configuration["Password"];
             services.AddDbContext<CommandContext>(opt => opt.UseNpgsql(builder.ConnectionString));
             services.AddScoped<ICommandAPIRepo, SqlCommandAPIRepo>();
+            services.AddAutoMapper(typeof(Startup));
+            services.AddSwaggerGen(opt => {
+                opt.SwaggerDoc("v1", new OpenApiInfo{ Version = "v1", Title = "CommandAPI" });
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
